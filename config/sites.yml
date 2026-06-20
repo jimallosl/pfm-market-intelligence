@@ -1,13 +1,14 @@
 settings:
   screenshot: true
   save_html: true
-  delay_ms: 1500
+  delay_ms: 2500
   timeout_ms: 45000
   max_depth_default: 1
   same_domain_only_default: true
 
 sources:
   - group: pfm_core
+    enabled: false  # Disabled for GitHub Actions: Cloudflare blocks GitHub IPs. Capture PFM manually/local and keep this as traceable caveat.
     name: Prop Firm Match Core Pages
     source_class: target_platform
     quality_estimate: high
@@ -41,6 +42,7 @@ sources:
     same_domain_only: true
 
   - group: pfm_business_check
+    enabled: false  # Disabled for GitHub Actions: Cloudflare blocks GitHub IPs. Capture PFM manually/local and keep this as traceable caveat.
     name: Prop Firm Match Business Public Check
     source_class: target_b2b_public_check
     quality_estimate: high
@@ -52,6 +54,7 @@ sources:
     same_domain_only: true
 
   - group: pfm_market_segments
+    enabled: false  # Disabled for GitHub Actions: Cloudflare blocks GitHub IPs. Capture PFM manually/local and keep this as traceable caveat.
     name: Prop Firm Match Segment Pages
     source_class: target_platform_segment_pages
     quality_estimate: high
