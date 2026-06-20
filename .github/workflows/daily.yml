@@ -1,0 +1,45 @@
+name: Daily market capture
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_pages_total:
+        description: "Maximum pages for this run"
+        required: false
+        default: "250"
+      max_pages_per_site:
+        description: "Maximum pages per source"
+        required: false
+        default: "50"
+  schedule:
+    - cron: "10 7 * * *"
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+      - name: Run scraper
+        env:
+          GAS_WEBHOOK_URL: ${{ secrets.GAS_WEBHOOK_URL }}
+        run: |
+          MAX_TOTAL="${{ github.event.inputs.max_pages_total || '250' }}"
+          MAX_SITE="${{ github.event.inputs.max_pages_per_site || '50' }}"
+          if [ -n "$GAS_WEBHOOK_URL" ]; then
+            python src/scrape.py --config config/sites.yml --max-pages-total "$MAX_TOTAL" --max-pages-per-site "$MAX_SITE" --send-to-gas
+          else
+            python src/scrape.py --config config/sites.yml --max-pages-total "$MAX_TOTAL" --max-pages-per-site "$MAX_SITE"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: market-capture-${{ github.run_id }}
+          path: data/run_*
+          retention-days: 14
