@@ -25,6 +25,36 @@ KNOWN_FIRM_HINTS = [
     "Bulenox","OneUp Trader","AquaFunded","Goat Funded Trader","For Traders","Darwinex Zero"
 ]
 
+
+BLOCK_PATTERNS = [
+    re.compile(r"(?i)Attention Required! \| Cloudflare"),
+    re.compile(r"(?i)Sorry, you have been blocked"),
+    re.compile(r"(?i)Please enable cookies"),
+    re.compile(r"(?i)Performance & security by\s+Cloudflare"),
+]
+MAX_SIGNALS_PER_TYPE_PER_PAGE = 25
+MAX_SIGNALS_PER_PAGE = 120
+GAS_TEXT_LIMIT = int(os.environ.get("GAS_TEXT_LIMIT", "12000"))
+
+def detect_block(status, title, text):
+    blob = f"{title}\n{text}"[:5000]
+    if str(status) in {"403", "429"} and any(p.search(blob) for p in BLOCK_PATTERNS):
+        return "blocked_by_cloudflare"
+    if any(p.search(blob) for p in BLOCK_PATTERNS):
+        return "blocked_or_bot_protection"
+    return ""
+
+def clip_rows_for_gas(rows):
+    clipped = []
+    for row in rows:
+        r = dict(row)
+        if "text" in r and isinstance(r["text"], str) and len(r["text"]) > GAS_TEXT_LIMIT:
+            r["text"] = r["text"][:GAS_TEXT_LIMIT] + "\n[TRUNCATED_FOR_GOOGLE_SHEETS_FULL_TEXT_IN_ARTIFACT]"
+        if "surrounding_text" in r and isinstance(r["surrounding_text"], str) and len(r["surrounding_text"]) > 1500:
+            r["surrounding_text"] = r["surrounding_text"][:1500]
+        clipped.append(r)
+    return clipped
+
 RAW_HEADERS = [
     "run_id","captured_at","source_group","source_name","source_class","quality_estimate","influence_estimate",
     "data_type","confidence_level","url","status","title","text_length","screenshot_path","html_path","error","text"
@@ -69,13 +99,17 @@ def extract_text_and_links(html, base_url):
 def surrounding(text, start, end, width=140):
     return re.sub(r"\s+", " ", text[max(0, start-width):min(len(text), end+width)]).strip()
 
-def confidence_from_status(status, error, text_length):
+def confidence_from_status(status, error, text_length, block_reason=""):
+    if block_reason:
+        return "low"
     if error:
         return "low"
     if str(status).startswith("2") and text_length > 500:
         return "high"
     if str(status).startswith("2") and text_length > 0:
         return "medium"
+    if str(status) in {"403", "429"}:
+        return "low"
     return "pending"
 
 def source_meta(source):
@@ -90,26 +124,50 @@ def source_meta(source):
 def extract_signals(text, source, url, run_id):
     rows, captured_at = [], now_iso()
     meta = source_meta(source)
+    seen = set()
+
+    # Do not extract “signals” from anti-bot / Cloudflare pages. They pollute the dataset.
+    if detect_block("", "", text):
+        return []
+
     def add_signal(signal_type, signal_value, surrounding_text):
+        nonlocal rows
+        val = re.sub(r"\s+", " ", signal_value).strip()
+        key = (signal_type, val.lower(), url)
+        if not val or key in seen or len(rows) >= MAX_SIGNALS_PER_PAGE:
+            return
+        seen.add(key)
         rows.append({
             "run_id": run_id,
             "captured_at": captured_at,
             **meta,
             "url": url,
             "signal_type": signal_type,
-            "signal_value": signal_value[:250],
+            "signal_value": val[:250],
             "surrounding_text": surrounding_text[:1000],
             "data_type": "parsed",
             "confidence_level": "medium",
             "extraction_method": "regex_text_pattern",
         })
+
+    firm_hits = 0
     for firm in KNOWN_FIRM_HINTS:
         for m in re.finditer(re.escape(firm), text, flags=re.I):
             add_signal("firm_name_candidate", firm, surrounding(text, m.start(), m.end()))
+            firm_hits += 1
+            if firm_hits >= 40 or len(rows) >= MAX_SIGNALS_PER_PAGE:
+                break
+        if firm_hits >= 40 or len(rows) >= MAX_SIGNALS_PER_PAGE:
+            break
+
     for typ, pattern in SIGNAL_PATTERNS.items():
-        for m in list(pattern.finditer(text))[:80]:
+        count = 0
+        for m in pattern.finditer(text):
+            if count >= MAX_SIGNALS_PER_TYPE_PER_PAGE or len(rows) >= MAX_SIGNALS_PER_PAGE:
+                break
             val = re.sub(r"\s+", " ", m.group(0)).strip()
             add_signal(typ, val, surrounding(text, m.start(), m.end()))
+            count += 1
     return rows
 
 async def capture_page(context, source, url, out_dir, run_id):
@@ -136,12 +194,15 @@ async def capture_page(context, source, url, out_dir, run_id):
     finally:
         await page.close()
     meta = source_meta(source)
-    conf = confidence_from_status(status, error, len(text))
+    block_reason = detect_block(status, title, text)
+    if block_reason and not error:
+        error = block_reason
+    conf = confidence_from_status(status, error, len(text), block_reason)
     raw = {
         "run_id": run_id,
         "captured_at": captured_at,
         **meta,
-        "data_type": "observed",
+        "data_type": "blocked" if block_reason else "observed",
         "confidence_level": conf,
         "url": url,
         "status": status,
@@ -152,7 +213,7 @@ async def capture_page(context, source, url, out_dir, run_id):
         "error": error,
         "text": text[:60000],
     }
-    return raw, extract_signals(text, source, url, run_id) if text else [], links
+    return raw, ([] if block_reason else (extract_signals(text, source, url, run_id) if text else [])), links
 
 def write_csv(path, rows, fieldnames):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -182,6 +243,8 @@ async def main():
             user_agent="Mozilla/5.0 (compatible; PFM-Market-Research-Bot/0.2; public market research)"
         )
         for src in cfg["sources"]:
+            if src.get("enabled") is False:
+                continue
             source = {**settings, **src}
             visited = set()
             queue = [(normalize_url(u), 0) for u in source.get("start_urls", [])]
@@ -226,7 +289,13 @@ async def main():
         webhook = os.environ.get("GAS_WEBHOOK_URL")
         if not webhook:
             raise RuntimeError("GAS_WEBHOOK_URL missing")
-        r = requests.post(webhook, json={"summary": summary, "raw_pages": raw_rows, "extracted_signals": signal_rows, "errors": error_rows}, timeout=60)
+        gas_payload = {
+            "summary": summary,
+            "raw_pages": clip_rows_for_gas(raw_rows),
+            "extracted_signals": clip_rows_for_gas(signal_rows),
+            "errors": clip_rows_for_gas(error_rows),
+        }
+        r = requests.post(webhook, json=gas_payload, timeout=60)
         print("GAS response:", r.status_code, r.text[:500])
     print(json.dumps(summary, indent=2, ensure_ascii=False))
 
