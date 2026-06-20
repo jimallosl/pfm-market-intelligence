@@ -1,0 +1,334 @@
+settings:
+  screenshot: true
+  save_html: true
+  delay_ms: 1500
+  timeout_ms: 45000
+  max_depth_default: 1
+  same_domain_only_default: true
+
+sources:
+  - group: pfm_core
+    name: Prop Firm Match Core Pages
+    source_class: target_platform
+    quality_estimate: high
+    influence_estimate: high
+    base_url: "https://propfirmmatch.com/"
+    start_urls:
+      - "https://propfirmmatch.com/"
+      - "https://propfirmmatch.com/all-prop-firms"
+      - "https://propfirmmatch.com/prop-firm-challenges"
+      - "https://propfirmmatch.com/offers"
+      - "https://propfirmmatch.com/best-sellers"
+      - "https://propfirmmatch.com/favorite-firms"
+      - "https://propfirmmatch.com/prop-firm-reviews"
+      - "https://propfirmmatch.com/payouts"
+      - "https://propfirmmatch.com/prop-firm-rules"
+      - "https://propfirmmatch.com/prop-firm-spreads"
+      - "https://propfirmmatch.com/payouts-leaderboard"
+      - "https://propfirmmatch.com/prop-firm-demo-accounts"
+      - "https://propfirmmatch.com/unlisted-prop-firms"
+      - "https://propfirmmatch.com/extra-account-promo"
+      - "https://propfirmmatch.com/join-affiliate-program"
+      - "https://propfirmmatch.com/bug-bounty"
+      - "https://propfirmmatch.com/transparency"
+      - "https://propfirmmatch.com/about-us"
+      - "https://propfirmmatch.com/careers"
+      - "https://propfirmmatch.com/how-it-works"
+      - "https://propfirmmatch.com/sitemap"
+      - "https://propfirmmatch.com/privacy"
+      - "https://propfirmmatch.com/terms"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: pfm_business_check
+    name: Prop Firm Match Business Public Check
+    source_class: target_b2b_public_check
+    quality_estimate: high
+    influence_estimate: high
+    base_url: "https://business.propfirmmatch.com/"
+    start_urls:
+      - "https://business.propfirmmatch.com/"
+    max_depth: 0
+    same_domain_only: true
+
+  - group: pfm_market_segments
+    name: Prop Firm Match Segment Pages
+    source_class: target_platform_segment_pages
+    quality_estimate: high
+    influence_estimate: high
+    base_url: "https://propfirmmatch.com/"
+    start_urls:
+      - "https://propfirmmatch.com/futures"
+      - "https://propfirmmatch.com/futures/best-sellers"
+      - "https://propfirmmatch.com/futures/favorite-firms"
+      - "https://propfirmmatch.com/futures/extra-account-promo"
+      - "https://propfirmmatch.com/crypto/best-sellers"
+      - "https://propfirmmatch.com/prop-firm-lists/countries"
+      - "https://propfirmmatch.com/prop-firm-lists/platforms"
+      - "https://propfirmmatch.com/prop-firm-lists/payout-methods"
+      - "https://propfirmmatch.com/prop-firm-lists/restricted-countries"
+      - "https://propfirmmatch.com/prop-firm-lists/platforms/mt5"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_direct_serious
+    name: Myfxbook Prop Firms
+    source_class: comparator_direct_serious
+    quality_estimate: high
+    influence_estimate: high
+    base_url: "https://www.myfxbook.com/"
+    start_urls:
+      - "https://www.myfxbook.com/prop-firms"
+      - "https://www.myfxbook.com/prop-firms/compare"
+      - "https://www.myfxbook.com/prop-firms-spreads"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_direct_serious
+    name: Prop Firm App
+    source_class: comparator_direct_serious
+    quality_estimate: medium_high
+    influence_estimate: medium
+    base_url: "https://propfirmapp.com/"
+    start_urls:
+      - "https://propfirmapp.com/"
+      - "https://propfirmapp.com/prop-firms"
+      - "https://propfirmapp.com/trading-offers"
+      - "https://propfirmapp.com/forex-prop-firms"
+      - "https://propfirmapp.com/futures-prop-firms"
+      - "https://propfirmapp.com/prop-firm-ranking-methodology"
+      - "https://propfirmapp.com/advertisement-disclosure"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_direct_serious
+    name: Prop Firm Stats
+    source_class: data_tool_comparator
+    quality_estimate: pending
+    influence_estimate: pending
+    base_url: "https://propfirmstats.com/"
+    start_urls:
+      - "https://propfirmstats.com/"
+      - "https://propfirmstats.com/compare"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_direct_serious
+    name: Prop Firm Compare
+    source_class: comparator_direct_serious_influencer_led
+    quality_estimate: pending
+    influence_estimate: medium_high
+    base_url: "https://propfirm.compare/"
+    start_urls:
+      - "https://propfirm.compare/"
+      - "https://propfirm.compare/propfirm/tradeify/challenges"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_direct_serious
+    name: Prop Firm Gorilla
+    source_class: comparator_direct_serious_futures_focused
+    quality_estimate: medium
+    influence_estimate: medium
+    base_url: "https://propfirmgorilla.com/"
+    start_urls:
+      - "https://propfirmgorilla.com/"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_direct_serious
+    name: The Prop Firm Guide
+    source_class: comparator_content_rules_deals
+    quality_estimate: medium
+    influence_estimate: pending
+    base_url: "https://thepropfirmguide.com/"
+    start_urls:
+      - "https://thepropfirmguide.com/prop-firm-rules-comparison/"
+      - "https://thepropfirmguide.com/deals/"
+      - "https://thepropfirmguide.com/compare-firms/"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_coupon_affiliate
+    name: Prop Firms Compared
+    source_class: coupon_affiliate_comparator
+    quality_estimate: medium
+    influence_estimate: medium
+    base_url: "https://www.propfirmscompared.com/"
+    start_urls:
+      - "https://www.propfirmscompared.com/"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_coupon_affiliate
+    name: Prop Firm Store
+    source_class: coupon_affiliate_site
+    quality_estimate: medium
+    influence_estimate: pending
+    base_url: "https://propfirmstore.com/"
+    start_urls:
+      - "https://propfirmstore.com/top-deals"
+      - "https://propfirmstore.com/compare"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_coupon_affiliate
+    name: Funded Now Comparison
+    source_class: coupon_affiliate_site
+    quality_estimate: pending
+    influence_estimate: pending
+    base_url: "https://funded.now/"
+    start_urls:
+      - "https://funded.now/"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_coupon_affiliate
+    name: Prop Firm Pal
+    source_class: coupon_affiliate_comparator
+    quality_estimate: pending
+    influence_estimate: pending
+    base_url: "https://propfirmpal.com/"
+    start_urls:
+      - "https://propfirmpal.com/"
+      - "https://propfirmpal.com/compare"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_coupon_affiliate
+    name: Only Prop Firms
+    source_class: coupon_affiliate_site
+    quality_estimate: pending
+    influence_estimate: pending
+    base_url: "https://onlypropfirms.com/"
+    start_urls:
+      - "https://onlypropfirms.com/"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_data_tool
+    name: Payout Junction
+    source_class: payout_data_tool
+    quality_estimate: pending
+    influence_estimate: pending
+    base_url: "https://payoutjunction.com/"
+    start_urls:
+      - "https://payoutjunction.com/"
+    max_depth: 1
+    same_domain_only: true
+
+  - group: competitor_content_seo
+    name: TradeZella Best Prop Firms
+    source_class: blog_seo_content
+    quality_estimate: medium
+    influence_estimate: medium
+    base_url: "https://www.tradezella.com/"
+    start_urls:
+      - "https://www.tradezella.com/blog/best-prop-trading-firms-2026-rankings"
+    max_depth: 0
+    same_domain_only: true
+
+  - group: competitor_content_seo
+    name: Benzinga Best Prop Trading Firms
+    source_class: media_content_seo
+    quality_estimate: medium
+    influence_estimate: high
+    base_url: "https://www.benzinga.com/"
+    start_urls:
+      - "https://www.benzinga.com/money/best-prop-trading-firms"
+    max_depth: 0
+    same_domain_only: true
+
+  - group: competitor_content_seo
+    name: Traders Second Brain Payout Proof
+    source_class: blog_seo_content
+    quality_estimate: pending
+    influence_estimate: pending
+    base_url: "https://traderssecondbrain.com/"
+    start_urls:
+      - "https://traderssecondbrain.com/guides/prop-firm-payout-proof"
+    max_depth: 0
+    same_domain_only: true
+
+  - group: prop_firm_forex_cfd
+    name: Forex CFD Prop Firms Batch 1
+    source_class: prop_firm_forex_cfd
+    quality_estimate: mixed_pending
+    influence_estimate: mixed_pending
+    base_url: "https://fundingpips.com/"
+    start_urls:
+      - "https://fundingpips.com/"
+      - "https://the5ers.com/"
+      - "https://fundednext.com/"
+      - "https://ftmo.com/"
+      - "https://alphacapitalgroup.uk/"
+      - "https://e8markets.com/"
+      - "https://brightfunded.com/"
+      - "https://www.fortraders.com/"
+      - "https://goatfundedtrader.com/"
+      - "https://blueguardian.com/"
+      - "https://aquafunded.com/"
+      - "https://maventrading.com/"
+      - "https://www.citytradersimperium.com/"
+      - "https://darwinexzero.com/"
+      - "https://thinkcapital.com/"
+    max_depth: 0
+    same_domain_only: false
+
+  - group: prop_firm_futures
+    name: Futures Prop Firms Batch 1
+    source_class: prop_firm_futures
+    quality_estimate: mixed_pending
+    influence_estimate: mixed_pending
+    base_url: "https://www.topstep.com/"
+    start_urls:
+      - "https://www.apextraderfunding.com/"
+      - "https://www.topstep.com/"
+      - "https://www.tradeday.com/"
+      - "https://www.earn2trade.com/"
+      - "https://myfundedfutures.com/"
+      - "https://tradeify.co/"
+      - "https://lucidtrading.com/"
+      - "https://alphafutures.com/"
+      - "https://takeprofittrader.com/"
+      - "https://bulenox.com/"
+      - "https://www.oneuptrader.com/"
+    max_depth: 0
+    same_domain_only: false
+
+  - group: vendor_platforms
+    name: Trading Platforms and Connectivity
+    source_class: vendor_trading_platforms
+    quality_estimate: pending
+    influence_estimate: pending
+    base_url: "https://www.metatrader5.com/"
+    start_urls:
+      - "https://www.metatrader5.com/"
+      - "https://www.ctrader.com/"
+      - "https://match-trader.com/"
+      - "https://dx.trade/"
+      - "https://tradelocker.com/"
+      - "https://ninjatrader.com/"
+      - "https://www.tradovate.com/"
+      - "https://www.rithmic.com/"
+      - "https://www.tradingview.com/"
+      - "https://www.jigsawtrading.com/"
+    max_depth: 0
+    same_domain_only: false
+
+  - group: vendor_infrastructure
+    name: Prop Firm Infrastructure and Compliance Vendors
+    source_class: vendor_infrastructure
+    quality_estimate: pending
+    influence_estimate: pending
+    base_url: "https://propaccount.com/"
+    start_urls:
+      - "https://propaccount.com/"
+      - "https://www.traderlands.com/"
+      - "https://brokeret.com/"
+      - "https://www.sumsub.com/"
+      - "https://veriff.com/"
+      - "https://withpersona.com/"
+      - "https://www.worthypayments.com/"
+    max_depth: 0
+    same_domain_only: false
